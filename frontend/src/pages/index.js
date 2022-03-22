@@ -11,6 +11,16 @@ const Banner = dynamic(
   { ssr: false },
 )
 
+// TODO: Remove dynamic import when web3-react supports ssr.
+const Terms = dynamic(
+  () => {
+    return import('../components/Terms').then((module) => {
+      return module.Terms
+    })
+  },
+  { ssr: false },
+)
+
 const Home = () => {
   return (
     <>
@@ -20,6 +30,7 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Banner />
+      <Terms />
     </>
   )
 }
