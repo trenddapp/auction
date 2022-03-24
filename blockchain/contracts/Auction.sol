@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract Auction {
-    address constant WETH = 0xDf032Bc4B9dC2782Bb09352007D4C57B75160B15;
+    address constant WETH = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
 
     struct AuctionInfo {
         uint64 startingTimestamp;
@@ -16,10 +16,6 @@ contract Auction {
         address seller;
     }
     mapping(address => mapping(uint256 => AuctionInfo)) public allAuctions;
-    mapping(address => mapping(uint256 => mapping(address => uint256)))
-        public auctionBids;
-
-    event AuctionCanceled(address nftContractAddress, uint256 tokenId);
 
     event AuctionCreated(
         address nftContractAddress,
@@ -41,12 +37,6 @@ contract Auction {
         address nftContractAddress,
         uint256 tokenId,
         uint256 amount,
-        address bidder
-    );
-
-    event BidCanceled(
-        address nftContractAddress,
-        uint256 _tokenId,
         address bidder
     );
 
@@ -126,6 +116,20 @@ contract Auction {
         _;
     }
 
+    modifier ifNotEnded(address _nftContractAddress, uint256 _tokenId) {
+        require(
+            allAuctions[_nftContractAddress][_tokenId].seller != address(0),
+            "The auction has already ended!"
+        );
+        uint256 time = allAuctions[_nftContractAddress][_tokenId]
+            .endingTimestamp + 7 days;
+        require(
+            block.timestamp > time,
+            "You can only force reset after 7 days!"
+        );
+        _;
+    }
+
     modifier ifOngoing(address _nftContractAddress, uint256 _tokenId) {
         require(
             block.timestamp <
@@ -143,14 +147,6 @@ contract Auction {
         require(
             _sender != allAuctions[_nftContractAddress][_tokenId].seller,
             "The seller can not bid!"
-        );
-        _;
-    }
-
-    modifier onlyBidder(address _nftContractAddress, uint256 _tokenId) {
-        require(
-            auctionBids[_nftContractAddress][_tokenId][msg.sender] > 0,
-            "You did not bid any amount!"
         );
         _;
     }
@@ -182,30 +178,10 @@ contract Auction {
         notSeller(_nftContractAddress, _tokenId, msg.sender)
         ifApprovedWeth(msg.sender, _bidAmount)
     {
-        auctionBids[_nftContractAddress][_tokenId][msg.sender] = _bidAmount;
         allAuctions[_nftContractAddress][_tokenId].highestBid = _bidAmount;
         allAuctions[_nftContractAddress][_tokenId].highestBidder = msg.sender;
 
         emit BidMade(_nftContractAddress, _tokenId, _bidAmount, msg.sender);
-    }
-
-    function cancelAuction(address _nftContractAddress, uint256 _tokenId)
-        external
-        ifOngoing(_nftContractAddress, _tokenId)
-        onlySeller(_nftContractAddress, _tokenId)
-    {
-        _reset(_nftContractAddress, _tokenId);
-
-        emit AuctionCanceled(_nftContractAddress, _tokenId);
-    }
-
-    function cancelBid(address _nftContractAddress, uint256 _tokenId)
-        external
-        onlyBidder(_nftContractAddress, _tokenId)
-    {
-        auctionBids[_nftContractAddress][_tokenId][msg.sender] = 0;
-
-        emit BidCanceled(_nftContractAddress, _tokenId, msg.sender);
     }
 
     function createAuction(
@@ -238,6 +214,40 @@ contract Auction {
             _endingTimestamp,
             msg.sender
         );
+    }
+
+    function endAuction(address _nftContractAddress, uint256 _tokenId)
+        external
+        ifEnded(_nftContractAddress, _tokenId)
+    {
+        address seller = allAuctions[_nftContractAddress][_tokenId].seller;
+        address highestBidder = allAuctions[_nftContractAddress][_tokenId]
+            .highestBidder;
+        uint256 highestBid = allAuctions[_nftContractAddress][_tokenId]
+            .highestBid;
+        _reset(_nftContractAddress, _tokenId);
+
+        IERC721(_nftContractAddress).transferFrom(
+            seller,
+            highestBidder,
+            _tokenId
+        );
+
+        require(IERC20(WETH).transferFrom(highestBidder, seller, highestBid));
+
+        emit AuctionEnded(
+            _nftContractAddress,
+            _tokenId,
+            allAuctions[_nftContractAddress][_tokenId].highestBid,
+            allAuctions[_nftContractAddress][_tokenId].highestBidder
+        );
+    }
+
+    function forceReset(address _nftContractAddress, uint256 _tokenId)
+        external
+        ifNotEnded(_nftContractAddress, _tokenId)
+    {
+        _reset(_nftContractAddress, _tokenId);
     }
 
     function updateEndingTimestamp(
