@@ -1,2 +1,6 @@
+clients:
+  etherscan:
+    apiKey: change-me
+
 http:
   port: 9080
