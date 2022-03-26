@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract Auction {
-    address constant WETH = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
+    address immutable WETH;
 
     struct AuctionInfo {
         uint64 startingTimestamp;
@@ -55,7 +55,7 @@ contract Auction {
     modifier auctionNotStarted(address _nftContractAddress, uint256 _tokenId) {
         require(
             allAuctions[_nftContractAddress][_tokenId].seller == address(0),
-            "The auction already started by the owner"
+            "The auction already started by the owner!"
         );
         _;
     }
@@ -165,6 +165,10 @@ contract Auction {
             "The sender is not the seller!"
         );
         _;
+    }
+
+    constructor(address _weth) {
+        WETH = _weth;
     }
 
     function bid(
