@@ -231,13 +231,17 @@ contract Auction {
             .highestBid;
         _reset(_nftContractAddress, _tokenId);
 
-        IERC721(_nftContractAddress).transferFrom(
-            seller,
-            highestBidder,
-            _tokenId
-        );
+        if (highestBidder != address(0)) {
+            IERC721(_nftContractAddress).transferFrom(
+                seller,
+                highestBidder,
+                _tokenId
+            );
 
-        require(IERC20(WETH).transferFrom(highestBidder, seller, highestBid));
+            require(
+                IERC20(WETH).transferFrom(highestBidder, seller, highestBid)
+            );
+        }
 
         emit AuctionEnded(
             _nftContractAddress,
