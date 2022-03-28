@@ -3,9 +3,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelinUpgradeable/contracts/access/OwnableUpgradeable.sol";
+import "@openzeppelinUpgradeable/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelinUpgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
-contract Auction {
-    address immutable WETH;
+contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
+    address private WETH;
 
     struct AuctionInfo {
         uint64 startingTimestamp;
@@ -167,10 +170,6 @@ contract Auction {
         _;
     }
 
-    constructor(address _weth) {
-        WETH = _weth;
-    }
-
     function bid(
         address _nftContractAddress,
         uint256 _tokenId,
@@ -258,6 +257,12 @@ contract Auction {
         _reset(_nftContractAddress, _tokenId);
     }
 
+    function initialize(address _weth) external initializer {
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+        WETH = _weth;
+    }
+
     function updateEndingTimestamp(
         address _nftContractAddress,
         uint256 _tokenId,
@@ -295,6 +300,8 @@ contract Auction {
             _newStartingPrice
         );
     }
+
+    function _authorizeUpgrade(address) internal override onlyOwner {}
 
     function _reset(address _nftContractAddress, uint256 _tokenId) private {
         allAuctions[_nftContractAddress][_tokenId] = AuctionInfo(
