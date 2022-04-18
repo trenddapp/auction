@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/dapp-z/auction/backend/service/nft/models"
 )
@@ -24,7 +25,6 @@ type client struct {
 	httpClient *http.Client
 }
 
-// NewClient returns a client that implements the Client interface.
 func NewClient(config *Config) Client {
 	return &client{
 		apiKey:     config.APIKey,
@@ -32,7 +32,7 @@ func NewClient(config *Config) Client {
 	}
 }
 
-func (c *client) GetNFTsByWalletAddress(ctx context.Context, address string) ([]models.NFT, error) {
+func (c *client) GetAccountNFTs(ctx context.Context, address string) ([]models.NFT, error) {
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, URL+"", http.NoBody)
 	if err != nil {
 		return nil, err
@@ -85,11 +85,8 @@ func (c *client) GetNFTsByWalletAddress(ctx context.Context, address string) ([]
 
 	var transactions []struct {
 		ContractAddress string `json:"contractAddress"`
-		From            string `json:"from"`
 		To              string `json:"to"`
 		TokenID         string `json:"tokenID"`
-		TokenName       string `json:"tokenName"`
-		TokenSymbol     string `json:"tokenSymbol"`
 	}
 
 	if err := json.Unmarshal(result.Result, &transactions); err != nil {
@@ -99,10 +96,12 @@ func (c *client) GetNFTsByWalletAddress(ctx context.Context, address string) ([]
 	nfts := make([]models.NFT, 0, len(transactions))
 
 	for _, transaction := range transactions {
+		if !strings.EqualFold(address, transaction.To) {
+			continue
+		}
+
 		nfts = append(nfts, models.NFT{
 			ContractAddress: transaction.ContractAddress,
-			From:            transaction.From,
-			To:              transaction.To,
 			TokenID:         transaction.TokenID,
 		})
 	}
