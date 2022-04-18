@@ -1,4 +1,4 @@
-package etherscan
+package nftport
 
 import (
 	"context"
@@ -7,5 +7,5 @@ import (
 )
 
 type Client interface {
-	GetAccountNFTs(ctx context.Context, address string) ([]models.NFT, error)
+	GetContractNFTs(ctx context.Context, address string) ([]models.NFT, error)
 }
