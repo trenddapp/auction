@@ -31,7 +31,8 @@ func (s *Server) GetAccountNFTs(ctx *gin.Context) {
 		return
 	}
 
-	nfts, err := s.clientEtherscan.GetAccountNFTs(ctx, address)
+	// TODO: Use etherscan.
+	nfts, err := s.clientNFTPort.GetAccountNFTs(ctx, address)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
