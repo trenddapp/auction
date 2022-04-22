@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/config"
 	"go.uber.org/fx"
@@ -27,6 +28,7 @@ func NewConfig(cfg *config.YAML) (*Config, error) {
 
 func NewRouter(cfg *Config, lifecycle fx.Lifecycle) *gin.Engine {
 	router := gin.Default()
+	router.Use(cors.Default())
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
