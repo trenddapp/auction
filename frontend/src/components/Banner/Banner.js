@@ -10,7 +10,7 @@ const Container = styled(Flex)`
   margin: 0 auto;
   max-width: ${({ theme }) => `${theme.siteWidth}px`};
 
-  ${({ theme }) => theme.mediaQueries.sm} {
+  ${({ theme }) => theme.mediaQueries.lg} {
     justify-content: space-between;
   }
 `
@@ -40,21 +40,21 @@ const Section = styled.section`
 `
 
 const Banner = () => {
-  const { isMobile } = useMatchBreakpoints()
+  const { isTablet } = useMatchBreakpoints()
   const theme = useTheme()
 
   return (
     <Section>
       <Container>
-        {isMobile ? null : (
+        {isTablet ? null : (
           <Text color={theme.colors.background} width="250px">
             Ethereum Rinkeby Network
           </Text>
         )}
         <Flex alignItems="center" justifyContent="center" width="250px">
           <Text color={theme.colors.background}>
-            Free Rinkeby ETH -{' '}
-            <Link href="https://faucets.chain.link/rinkeby" target="_blank">
+            Mint NFTs for free -{' '}
+            <Link href="https://boredapeyachtclub.netlify.app" target="_blank">
               Open website
             </Link>
           </Text>
@@ -62,9 +62,9 @@ const Banner = () => {
             <SvgExternalLink height="16px" width="16px" />
           </Icon>
         </Flex>
-        {isMobile ? null : (
+        {isTablet ? null : (
           <Text color={theme.colors.background} textAlign="right" width="250px">
-            Get your free ETH to buy tickets!
+            Get your free NFTs to use auction!
           </Text>
         )}
       </Container>
