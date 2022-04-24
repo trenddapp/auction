@@ -1,37 +1,10 @@
 import Head from 'next/head'
-import dynamic from 'next/dynamic'
 
-// TODO: Remove dynamic import when web3-react supports ssr.
-const Banner = dynamic(
-  () => {
-    return import('../components/Banner').then((module) => {
-      return module.Banner
-    })
-  },
-  { ssr: false },
-)
+import { Banner } from '../components/Banner'
+import { Nav } from '../components/Nav'
+import { Terms } from '../components/Terms'
 
-// TODO: Remove dynamic import when web3-react supports ssr.
-const Nav = dynamic(
-  () => {
-    return import('../components/Nav').then((module) => {
-      return module.Nav
-    })
-  },
-  { ssr: false },
-)
-
-// TODO: Remove dynamic import when web3-react supports ssr.
-const Terms = dynamic(
-  () => {
-    return import('../components/Terms').then((module) => {
-      return module.Terms
-    })
-  },
-  { ssr: false },
-)
-
-const Home = () => {
+const HomePage = () => {
   return (
     <>
       <Head>
@@ -46,4 +19,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default HomePage
