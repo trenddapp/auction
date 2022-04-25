@@ -43,7 +43,7 @@ const Details = styled(Flex)`
   }
 `
 
-const Image = styled(Flex)`
+const File = styled(Flex)`
   align-items: center;
   border-radius: ${({ theme }) => theme.radii.small};
   border: 1px dashed ${({ theme }) => theme.colors.borderAlt};
@@ -106,18 +106,18 @@ const NftPage = () => {
       <Section>
         <Container>
           <Flex alignItems="center" flexDirection="column" justifyContent="center">
-            <Image>
-              {isLoading ? (
-                <SvgPhotograph height="60px" width="60px" />
-              ) : error !== undefined ? (
+            <File>
+              {error !== undefined ? (
                 <Flex alignItems="center" flexDirection="column" justifyContent="center">
                   <Text>Oops!</Text>
                   <Text as="span">Something went wrong.</Text>
                 </Flex>
+              ) : isLoading ? (
+                <SvgPhotograph height="60px" width="60px" />
               ) : (
                 <img src={image} alt="icons" />
               )}
-            </Image>
+            </File>
             <Details>
               <Flex alignItems="center" justifyContent="space-between">
                 <Text>Blockchain:</Text>
@@ -143,7 +143,7 @@ const NftPage = () => {
           </Flex>
           <Metadata>
             <Text color={theme.colors.headline} fontSize="36px">
-              {isLoading ? 'NAME' : error !== undefined ? 'NOT FOUND' : metadata.name}
+              {error !== undefined ? 'NOT FOUND' : isLoading ? 'NAME' : metadata.name}
             </Text>
           </Metadata>
         </Container>

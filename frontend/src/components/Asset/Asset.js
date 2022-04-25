@@ -28,7 +28,7 @@ const Details = styled(Flex)`
   width: 100%;
 `
 
-const Image = styled(Flex)`
+const File = styled(Flex)`
   align-items: center;
   height: 250px;
   justify-content: center;
@@ -46,21 +46,21 @@ const Asset = ({ contractAddress, tokenId }) => {
 
   return (
     <Container>
-      <Image>
-        {isLoading ? (
-          <SvgPhotograph height="50px" width="50px" />
-        ) : error !== undefined ? (
+      <File>
+        {error !== undefined ? (
           <Flex alignItems="center" flexDirection="column" justifyContent="center">
             <Text>Oops!</Text>
             <Text as="span">Something went wrong.</Text>
           </Flex>
+        ) : isLoading ? (
+          <SvgPhotograph height="50px" width="50px" />
         ) : (
           <img src={image} alt="icons" />
         )}
-      </Image>
+      </File>
       <Details>
         <Flex>
-          <Link href={`/nft/${contractAddress}/${tokenId}`}>
+          <Link href={`/nft/${contractAddress}/${tokenId}`} passHref>
             <TokenId>
               #
               {tokenId.length <= 8
