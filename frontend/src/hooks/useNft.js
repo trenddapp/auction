@@ -8,14 +8,14 @@ const useNft = (contractAddress, tokenId) => {
   const [metadata, setMetadata] = useState()
   const contractNft = useContractNft(contractAddress)
 
-  useEffect(async () => {
+  useEffect(() => {
     if (contractNft === undefined) {
       setError('useNft hook: undefined nft contract')
       setIsLoading(false)
       return
     }
 
-    try {
+    const fetchNft = async () => {
       const metadataCid = await contractNft.tokenURI(tokenId)
 
       let metadataUri = `https://ipfs.io/ipfs/${metadataCid}`
@@ -35,12 +35,10 @@ const useNft = (contractAddress, tokenId) => {
       const imageRaw = await fetch(imageUri)
       const imageBlob = await imageRaw.blob()
       setImage(URL.createObjectURL(imageBlob))
-
-      setIsLoading(false)
-    } catch (error) {
-      setError(`useNft hook: ${error}`)
       setIsLoading(false)
     }
+
+    fetchNft().catch((error) => setError(`useNft hook: ${error}`))
   }, [])
 
   return {

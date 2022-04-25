@@ -39,18 +39,17 @@ const Contract = () => {
   const router = useRouter()
   const { param: address } = router.query
 
-  useEffect(async () => {
-    try {
+  useEffect(() => {
+    const fetchNfts = async () => {
       const nftsUri = `https://127.0.0.1:9080/nft/contract/${address}`
       const nftsRaw = await fetch(nftsUri)
       const nftsJson = await nftsRaw.json()
       setNfts(nftsJson.nfts)
-    } catch (error) {
-      setError(`ContractPage component: ${error}`)
+      setIsLoading(false)
     }
 
-    setIsLoading(false)
-  }, [])
+    fetchNfts().catch((error) => setError(`ContractPage component: ${error}`))
+  }, [address])
 
   return (
     <>
@@ -63,13 +62,10 @@ const Contract = () => {
       <Nav />
       <Section>
         <Container>
-          {isLoading ? (
+          {error !== undefined ? (
+            <Text>Oops! Something went wrong.</Text>
+          ) : isLoading ? (
             <Text>Loading...</Text>
-          ) : error !== undefined ? (
-            <Flex alignItems="center" flexDirection="column" justifyContent="center">
-              <Text>Oops!</Text>
-              <Text>Something went wrong.</Text>
-            </Flex>
           ) : (
             nfts.map((nft) => <Asset contractAddress={nft.ContractAddress} key={nft.TokenID} tokenId={nft.TokenID} />)
           )}
