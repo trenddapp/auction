@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+
 import { Flex, Text } from '../Toolkit'
 
 const Main = styled(Text)`

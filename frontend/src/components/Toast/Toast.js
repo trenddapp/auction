@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react'
+
 import styled, { useTheme } from 'styled-components'
-import { SvgBan, SvgCheckCircle, SvgExclamation, SvgInformationCircle } from '../Svg'
+
 import { Box, Flex, Text } from '../Toolkit'
+import { SvgBan, SvgCheckCircle, SvgExclamation, SvgInformationCircle } from '../Svg'
 
 export const variants = {
   DANGER: 'danger',

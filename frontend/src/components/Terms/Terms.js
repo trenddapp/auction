@@ -1,6 +1,7 @@
 import styled, { useTheme } from 'styled-components'
-import { SvgGitHub } from '../Svg'
+
 import { Flex, Text } from '../Toolkit'
+import { SvgGitHub } from '../Svg'
 
 const Container = styled(Flex)`
   align-items: center;

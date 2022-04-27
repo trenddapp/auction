@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+
 import { SvgMore } from '../Svg'
 
 const ConnectButton = styled.button`

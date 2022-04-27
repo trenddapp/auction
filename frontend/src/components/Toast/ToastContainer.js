@@ -1,6 +1,7 @@
 import styled, { useTheme } from 'styled-components'
-import { useToast } from '../../hooks'
+
 import { Box } from '../Toolkit'
+import { useToast } from '../../hooks'
 import Toast from './Toast'
 
 const Container = styled(Box)``
