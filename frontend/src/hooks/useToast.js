@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+
 import { ToastsContext } from '../store/Toasts'
 
 const useToast = () => {

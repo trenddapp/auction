@@ -1,5 +1,7 @@
 import { useState } from 'react'
+
 import kebabCase from 'lodash/kebabCase'
+
 import { toastTypes } from '../../components/Toast'
 import ToastsContext from './Context'
 

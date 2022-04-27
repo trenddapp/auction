@@ -1,7 +1,8 @@
 import styled, { useTheme } from 'styled-components'
-import { useMatchBreakpoints } from '../../hooks'
+
 import { Flex, Text } from '../Toolkit'
 import { SvgExternalLink } from '../Svg'
+import { useMatchBreakpoints } from '../../hooks'
 
 const Container = styled(Flex)`
   align-items: center;

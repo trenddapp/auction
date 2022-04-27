@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { Modal, ModalHeader, ModalBody, ModalTitle } from '../Modal'
+
 import styled from 'styled-components'
+
+import { Modal, ModalHeader, ModalBody, ModalTitle } from '../Modal'
 import ConnectCancel from './ConnectCancel'
 import ConnectCard, { ConnectCardMore } from './ConnectCard'
 import connectors from '../../config/connectors'

@@ -1,8 +1,9 @@
 import styled from 'styled-components'
-import { useMatchBreakpoints, useWeb3Profile } from '../../hooks'
+
+import { Flex } from '../Toolkit'
 import { Logo } from '../Logo'
 import { Profile } from '../Profile'
-import { Flex } from '../Toolkit'
+import { useMatchBreakpoints, useWeb3Profile } from '../../hooks'
 import { WalletConnectButton } from '../Wallet'
 
 const Container = styled(Flex)`

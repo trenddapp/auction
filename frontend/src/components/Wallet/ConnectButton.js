@@ -1,5 +1,7 @@
 import { useState } from 'react'
+
 import styled from 'styled-components'
+
 import ConnectModal from './ConnectModal'
 
 const Button = styled.button`

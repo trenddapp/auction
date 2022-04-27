@@ -1,5 +1,5 @@
-import { useWeb3React } from '.'
 import { defaultChainId } from '../config/constants'
+import useWeb3React from './useWeb3React'
 
 const useWeb3Profile = () => {
   const { usePriorityAccount, usePriorityChainId, usePriorityIsActivating, usePriorityIsActive } = useWeb3React()

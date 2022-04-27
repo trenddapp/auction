@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
+
 import styled from 'styled-components'
-import { useToast, useWeb3Profile } from '../../hooks'
+
+import { Flex, Text } from '../Toolkit'
 import { shortenAddress } from '../../utils'
 import { SvgChevronDown, SvgExclamation, SvgUser } from '../Svg'
-import { Flex, Text } from '../Toolkit'
+import { useToast, useWeb3Profile } from '../../hooks'
 
 const Circle = styled(Flex)`
   align-items: center;
