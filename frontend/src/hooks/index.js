@@ -1,3 +1,4 @@
+export { default as useContractAuction } from './useContractAuction'
 export { default as useContractNft } from './useContractNft'
 export { default as useIsomorphicEffect } from './useIsomorphicEffect'
 export { default as useMatchBreakpoints } from './useMatchBreakpoints'
