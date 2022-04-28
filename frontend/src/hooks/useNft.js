@@ -7,7 +7,8 @@ const useNft = (contractAddress, tokenId) => {
   const [image, setImage] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [metadata, setMetadata] = useState()
-  const contractNft = useContractNft(contractAddress)
+  const [owner, setOwner] = useState()
+  const contractNft = useContractNft(contractAddress, undefined)
 
   useEffect(() => {
     if (contractNft === undefined) {
@@ -36,6 +37,10 @@ const useNft = (contractAddress, tokenId) => {
       const imageRaw = await fetch(imageUri)
       const imageBlob = await imageRaw.blob()
       setImage(URL.createObjectURL(imageBlob))
+
+      const owner = await contractNft.ownerOf(tokenId)
+      setOwner(owner)
+
       setIsLoading(false)
     }
 
@@ -47,6 +52,7 @@ const useNft = (contractAddress, tokenId) => {
     image,
     isLoading,
     metadata,
+    owner,
   }
 }
 
