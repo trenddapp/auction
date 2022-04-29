@@ -41,13 +41,13 @@ const Section = styled.section`
 `
 
 const Banner = () => {
-  const { isTablet } = useMatchBreakpoints()
+  const { isMobile, isTablet } = useMatchBreakpoints()
   const theme = useTheme()
 
   return (
     <Section>
       <Container>
-        {isTablet ? null : (
+        {isMobile || isTablet ? null : (
           <Text color={theme.colors.background} width="250px">
             Ethereum Rinkeby Network
           </Text>
@@ -63,7 +63,7 @@ const Banner = () => {
             <SvgExternalLink height="16px" width="16px" />
           </Icon>
         </Flex>
-        {isTablet ? null : (
+        {isMobile || isTablet ? null : (
           <Text color={theme.colors.background} textAlign="right" width="250px">
             Get your free NFTs to use auction!
           </Text>
