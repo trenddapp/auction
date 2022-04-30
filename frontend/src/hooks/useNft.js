@@ -13,7 +13,6 @@ const useNft = (contractAddress, tokenId) => {
   useEffect(() => {
     if (contractNft === undefined) {
       setError('useNft hook: undefined nft contract')
-      setIsLoading(false)
       return
     }
 
