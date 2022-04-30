@@ -1,0 +1,5 @@
+export { Auction as NftAuction } from './Auction'
+export { Base as NftBase } from './Base'
+export { Details as NftDetails } from './Details'
+export { File as NftFile } from './File'
+export { Timer as NftTimer } from './Timer'

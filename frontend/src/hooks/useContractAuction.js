@@ -8,7 +8,7 @@ import useWeb3ChainId from './useWeb3ChainId'
 import useWeb3Provider from './useWeb3Provider'
 
 const useContractAuction = (signer) => {
-  const address = addresses.auction[useWeb3ChainId()]
+  const address = addresses.proxy.auction[useWeb3ChainId()]
   const provider = useWeb3Provider()
 
   try {
