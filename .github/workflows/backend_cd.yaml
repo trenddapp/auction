@@ -1,0 +1,25 @@
+name: Backend CD
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - ./backend/**
+jobs:
+  golang:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Deploy - nft serve http
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        appdir: ./backend
+        branch: main
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: dappz-auction
+        heroku_email: ${{secrets.HEROKU_EMAIL}}
+        procfile: "web: bin/nft serve http"
+        region: eu
+      env:
+        HD_GOVERSION: go1.18
