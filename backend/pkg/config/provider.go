@@ -10,7 +10,6 @@ import (
 func NewYAML() (*config.YAML, error) {
 	options := []config.YAMLOption{
 		config.Expand(os.LookupEnv),
-		config.Source(strings.NewReader(os.Getenv("CONFIG"))),
 	}
 
 	for _, path := range generatePaths("base") {
@@ -20,6 +19,11 @@ func NewYAML() (*config.YAML, error) {
 
 		options = append(options, config.File(path))
 	}
+
+	options = append(
+		options,
+		config.Source(strings.NewReader(os.Getenv("CONFIG"))),
+	)
 
 	return config.NewYAML(options...)
 }
