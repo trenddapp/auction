@@ -4,7 +4,7 @@ on:
     branches:
     - main
     paths:
-    - ./backend/**
+    - backend/**
     types:
     - opened
     - reopened
@@ -21,12 +21,12 @@ jobs:
         go-version: 1.18.1
     - name: Build
       run: go build -v ./...
-      working-directory: ./backend
+      working-directory: backend
     - name: Test
       run: go test -v ./...
-      working-directory: ./backend
+      working-directory: backend
     - name: Lint
       uses: golangci/golangci-lint-action@v3
       with:
         version: latest
-        working-directory: ./backend
+        working-directory: backend
