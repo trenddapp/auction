@@ -65,7 +65,6 @@ func (c *client) GetAccountNFTs(ctx context.Context, address string) ([]models.N
 	var result struct {
 		NFTs []struct {
 			ContractAddress string `json:"contract_address"`
-			FileURL         string `json:"file_url"`
 			TokenID         string `json:"token_id"`
 		} `json:"nfts"`
 		Response string `json:"response"`
@@ -84,7 +83,6 @@ func (c *client) GetAccountNFTs(ctx context.Context, address string) ([]models.N
 	for _, nft := range result.NFTs {
 		nfts = append(nfts, models.NFT{
 			ContractAddress: nft.ContractAddress,
-			FileURL:         nft.FileURL,
 			TokenID:         nft.TokenID,
 		})
 	}
@@ -125,7 +123,6 @@ func (c *client) GetContractNFTs(ctx context.Context, address string) ([]models.
 	var result struct {
 		NFTs []struct {
 			ContractAddress string `json:"contract_address"`
-			FileURL         string `json:"file_url"`
 			TokenID         string `json:"token_id"`
 		} `json:"nfts"`
 		Response string `json:"response"`
@@ -144,7 +141,6 @@ func (c *client) GetContractNFTs(ctx context.Context, address string) ([]models.
 	for _, nft := range result.NFTs {
 		nfts = append(nfts, models.NFT{
 			ContractAddress: nft.ContractAddress,
-			FileURL:         nft.FileURL,
 			TokenID:         nft.TokenID,
 		})
 	}
@@ -182,7 +178,6 @@ func (c *client) GetNFT(ctx context.Context, contractAddress string, tokenID str
 	var result struct {
 		NFT struct {
 			ContractAddress string `json:"contract_address"`
-			FileURL         string `json:"file_url"`
 			TokenID         string `json:"token_id"`
 		} `json:"nft"`
 		Response string `json:"response"`
@@ -198,7 +193,6 @@ func (c *client) GetNFT(ctx context.Context, contractAddress string, tokenID str
 
 	return &models.NFT{
 		ContractAddress: result.NFT.ContractAddress,
-		FileURL:         result.NFT.FileURL,
 		TokenID:         result.NFT.TokenID,
 	}, nil
 }
