@@ -22,4 +22,5 @@ jobs:
         procfile: "web: bin/nft serve http"
         region: eu
       env:
+        HD_CONFIG: ${{secrets.CONFIG}}
         HD_GOVERSION: go1.18

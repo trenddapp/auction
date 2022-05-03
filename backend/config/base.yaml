@@ -5,4 +5,4 @@ clients:
     apiKey: change-me
 
 http:
-  port: 9080
+  port: ${PORT:9080}
