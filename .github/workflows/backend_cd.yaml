@@ -4,7 +4,7 @@ on:
     branches:
     - main
     paths:
-    - ./backend/**
+    - backend/**
 jobs:
   golang:
     runs-on: ubuntu-latest
@@ -14,7 +14,7 @@ jobs:
     - name: Deploy - nft serve http
       uses: akhileshns/heroku-deploy@v3.12.12
       with:
-        appdir: ./backend
+        appdir: backend
         branch: main
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: dappz-auction
