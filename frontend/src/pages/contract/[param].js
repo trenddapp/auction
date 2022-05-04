@@ -41,7 +41,7 @@ const Contract = () => {
 
   useEffect(() => {
     const fetchNfts = async () => {
-      const nftsUri = `https://127.0.0.1:9080/nft/contract/${address}`
+      const nftsUri = `https://dappz-auction.herokuapp.com/nft/contract/${address}`
       const nftsRaw = await fetch(nftsUri)
       const nftsJson = await nftsRaw.json()
       setNfts(nftsJson.nfts)
