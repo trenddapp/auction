@@ -5,6 +5,7 @@ on:
     - main
     paths:
     - backend/**
+  workflow_dispatch:
 jobs:
   golang:
     runs-on: ubuntu-latest
