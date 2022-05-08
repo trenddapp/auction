@@ -5,6 +5,7 @@ on:
     - main
     paths:
     - frontend/**
+  workflow_dispatch:
 jobs:
   nextjs:
     runs-on: ubuntu-latest
