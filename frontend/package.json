@@ -7,7 +7,7 @@
     "export": "next build && next export",
     "format": "prettier --write '**/*.js'",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start -p $PORT"
   },
   "dependencies": {
     "@web3-react/core": "8.0.23-beta.0",
@@ -27,5 +27,8 @@
     "eslint-config-prettier": "^8.4.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "2.5.1"
+  },
+  "engines": {
+    "node": "17.x"
   }
 }

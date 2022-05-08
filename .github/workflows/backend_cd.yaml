@@ -17,7 +17,7 @@ jobs:
         appdir: backend
         branch: main
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-        heroku_app_name: dappz-auction
+        heroku_app_name: dappz-auction-backend-nft-http
         heroku_email: ${{secrets.HEROKU_EMAIL}}
         procfile: "web: bin/nft serve http"
         region: eu

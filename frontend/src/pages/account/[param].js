@@ -19,7 +19,7 @@ const AccountPage = () => {
     }
 
     const fetchNfts = async () => {
-      const nftsUri = `https://dappz-auction.herokuapp.com/nft/account/${address}`
+      const nftsUri = `https://dappz-auction-backend-nft-http/nft/account/${address}`
       const nftsRaw = await fetch(nftsUri)
       const nftsJson = await nftsRaw.json()
       setNfts(nftsJson.nfts)

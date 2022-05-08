@@ -19,7 +19,7 @@ const Contract = () => {
     }
 
     const fetchNfts = async () => {
-      const nftsUri = `https://dappz-auction.herokuapp.com/nft/contract/${address}`
+      const nftsUri = `https://dappz-auction-backend-nft-http.herokuapp.com/nft/contract/${address}`
       const nftsRaw = await fetch(nftsUri)
       const nftsJson = await nftsRaw.json()
       setNfts(nftsJson.nfts)
