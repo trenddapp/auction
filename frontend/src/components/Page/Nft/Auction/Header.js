@@ -31,7 +31,7 @@ const Header = ({ isOwner, nft }) => {
           <Text>0x0...000</Text>
         ) : (
           <Clickable as="a" href={getEtherscanUrl(nft.owner)} target="_blank">
-            {isOwner ? you : shortenAddress(nft.owner)}
+            {isOwner ? 'you' : shortenAddress(nft.owner)}
             <Box marginLeft="3px">
               <SvgExternalLink height="12px" width="12px" />
             </Box>
