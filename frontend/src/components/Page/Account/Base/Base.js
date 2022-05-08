@@ -8,24 +8,18 @@ import { Nav } from '../../../Nav'
 import { Terms } from '../../../Terms'
 
 const Container = styled(Flex)`
-  align-items: center;
-  flex-direction: column;
-  height: 100%;
+  flex-wrap: wrap;
+  justify-content: space-around;
   margin: 0 auto;
   max-width: ${({ theme }) => `${theme.siteWidth}px`};
 
   /* Banner: 30px, Nav: 84px, Terms: 50px */
   min-height: calc(100vh - 30px - 84px - 50px - 1px);
-  padding: 16px;
+  padding: 8px;
 
   ${({ theme }) => theme.mediaQueries.sm} {
     border-left: 1px dashed ${({ theme }) => theme.colors.borderAlt};
     border-right: 1px dashed ${({ theme }) => theme.colors.borderAlt};
-  }
-
-  ${({ theme }) => theme.mediaQueries.lg} {
-    align-items: flex-start;
-    flex-direction: row;
   }
 `
 
@@ -39,7 +33,7 @@ const Base = ({ children }) => {
   return (
     <>
       <Head>
-        <title>Auction | NFT</title>
+        <title>Auction | Account</title>
         <meta name="description" content="Decentralized Auction by DAPP-Z" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
