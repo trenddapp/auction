@@ -42,6 +42,10 @@ const AccountPage = () => {
   const { param: address } = router.query
 
   useEffect(() => {
+    if (!router.isReady) {
+      return
+    }
+
     const fetchNfts = async () => {
       const nftsUri = `https://dappz-auction.herokuapp.com/nft/account/${address}`
       const nftsRaw = await fetch(nftsUri)
@@ -50,8 +54,12 @@ const AccountPage = () => {
       setIsLoading(false)
     }
 
-    fetchNfts().catch((error) => setError(`AccountPage component: ${error}`))
-  }, [address])
+    try {
+      fetchNfts()
+    } catch (error) {
+      setError(`AccountPage component: ${error}`)
+    }
+  }, [address, router.isReady])
 
   return (
     <>
