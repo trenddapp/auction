@@ -1,8 +1,0 @@
-clients:
-  etherscan:
-    apiKey: change-me
-  nftport:
-    apiKey: change-me
-
-http:
-  port: ${PORT:9080}
