@@ -1,13 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../interfaces/IAuction.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelinUpgradeable/contracts/access/OwnableUpgradeable.sol";
 import "@openzeppelinUpgradeable/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelinUpgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
-contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
+contract Auction is
+    IAuction,
+    Initializable,
+    UUPSUpgradeable,
+    OwnableUpgradeable
+{
     address private WETH;
 
     struct AuctionInfo {
@@ -18,42 +24,10 @@ contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         address highestBidder;
         address seller;
     }
-    mapping(address => mapping(uint256 => AuctionInfo)) public allAuctions;
-
-    event AuctionCreated(
-        address nftContractAddress,
-        uint256 tokenId,
-        uint256 startingPrice,
-        uint64 startingTimestamp,
-        uint64 endingTimestamp,
-        address seller
-    );
-
-    event AuctionEnded(
-        address nftContractAddress,
-        uint256 tokenId,
-        uint256 highestBid,
-        address highestBidder
-    );
-
-    event BidMade(
-        address nftContractAddress,
-        uint256 tokenId,
-        uint256 amount,
-        address bidder
-    );
-
-    event EndingTimestampUpdated(
-        address nftContractAddress,
-        uint256 tokenId,
-        uint64 endingTimestamp
-    );
-
-    event StartingPriceUpdated(
-        address nftContractAddress,
-        uint256 tokenId,
-        uint256 startingPrice
-    );
+    /// @inheritdoc IAuction
+    mapping(address => mapping(uint256 => AuctionInfo))
+        public
+        override allAuctions;
 
     modifier auctionNotStarted(address _nftContractAddress, uint256 _tokenId) {
         require(
@@ -170,12 +144,14 @@ contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         _;
     }
 
+    /// @inheritdoc IAuction
     function bid(
         address _nftContractAddress,
         uint256 _tokenId,
         uint256 _bidAmount
     )
         external
+        override
         ifOngoing(_nftContractAddress, _tokenId)
         checkBidAmount(_nftContractAddress, _tokenId, _bidAmount)
         notSeller(_nftContractAddress, _tokenId, msg.sender)
@@ -187,6 +163,7 @@ contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         emit BidMade(_nftContractAddress, _tokenId, _bidAmount, msg.sender);
     }
 
+    /// @inheritdoc IAuction
     function createAuction(
         address _nftContractAddress,
         uint256 _tokenId,
@@ -195,6 +172,7 @@ contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         uint64 _endingTimestamp
     )
         external
+        override
         onlyNftOwner(_nftContractAddress, _tokenId)
         auctionNotStarted(_nftContractAddress, _tokenId)
         checkTimestamp(_startingTimestamp, _endingTimestamp)
@@ -219,8 +197,10 @@ contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         );
     }
 
+    /// @inheritdoc IAuction
     function endAuction(address _nftContractAddress, uint256 _tokenId)
         external
+        override
         ifEnded(_nftContractAddress, _tokenId)
     {
         address seller = allAuctions[_nftContractAddress][_tokenId].seller;
@@ -250,25 +230,30 @@ contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         );
     }
 
+    /// @inheritdoc IAuction
     function forceReset(address _nftContractAddress, uint256 _tokenId)
         external
+        override
         ifNotEnded(_nftContractAddress, _tokenId)
     {
         _reset(_nftContractAddress, _tokenId);
     }
 
+    // constructor
     function initialize(address _weth) external initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         WETH = _weth;
     }
 
+    /// @inheritdoc IAuction
     function updateEndingTimestamp(
         address _nftContractAddress,
         uint256 _tokenId,
         uint64 _newEndingTimestamp
     )
         external
+        override
         ifOngoing(_nftContractAddress, _tokenId)
         onlySeller(_nftContractAddress, _tokenId)
     {
@@ -282,12 +267,14 @@ contract Auction is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         );
     }
 
+    /// @inheritdoc IAuction
     function updateStartingPrice(
         address _nftContractAddress,
         uint256 _tokenId,
         uint256 _newStartingPrice
     )
         external
+        override
         ifOngoing(_nftContractAddress, _tokenId)
         onlySeller(_nftContractAddress, _tokenId)
     {
