@@ -32,7 +32,7 @@ contract Auction is
     modifier auctionNotStarted(address _nftContractAddress, uint256 _tokenId) {
         require(
             allAuctions[_nftContractAddress][_tokenId].seller == address(0),
-            "The auction already started by the owner!"
+            "The auction has already been started by the owner!"
         );
         _;
     }
