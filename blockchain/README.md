@@ -4,7 +4,7 @@
 ## Auction contract
 
 A verified version of the Auction contract on the Rinkeby network:
-https://rinkeby.etherscan.io/address/0x8576cc7B6BB1F59fC0083D824903B33BDA68A76A
+https://rinkeby.etherscan.io/address/0x1769469803B83722A9D10E9FdfD7bE5C808f71E0
 
 
 ## Proxy contract
