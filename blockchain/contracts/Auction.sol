@@ -241,6 +241,7 @@ contract Auction is
 
     // constructor
     function initialize(address _weth) external initializer {
+        require(_weth != address(0));
         __Ownable_init();
         __UUPSUpgradeable_init();
         WETH = _weth;
