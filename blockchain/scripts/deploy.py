@@ -37,7 +37,7 @@ def main():
     auction.initialize(config["networks"][network.show_active()]["weth"])
 
     proxy = deploy_proxy(auction)
-    print(f"Proxt deployed at {proxy} !")
+    print(f"Proxy deployed at {proxy} !")
     auction_proxy = Contract.from_abi(
         "Proxy", proxy.address, auction.abi)
     auction_proxy.initialize(
