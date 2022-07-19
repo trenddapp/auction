@@ -88,14 +88,14 @@ interface IAuction {
     /// @notice If the auction does not end after 7 days, it will terminate the auction
     function forceReset(address _nftContractAddress, uint256 _tokenId) external;
 
-    /// @notice Update the end time of the auction
+    /// @notice Updates the end time of the auction
     function updateEndingTimestamp(
         address _nftContractAddress,
         uint256 _tokenId,
         uint64 _newEndingTimestamp
     ) external;
 
-    /// @notice Update the opening bid of the auction
+    /// @notice Updates the opening bid of the auction
     function updateStartingPrice(
         address _nftContractAddress,
         uint256 _tokenId,
