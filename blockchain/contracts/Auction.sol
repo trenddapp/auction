@@ -292,13 +292,6 @@ contract Auction is
     function _authorizeUpgrade(address) internal override onlyOwner {}
 
     function _reset(address _nftContractAddress, uint256 _tokenId) private {
-        allAuctions[_nftContractAddress][_tokenId] = AuctionInfo(
-            0,
-            0,
-            0,
-            0,
-            address(0),
-            address(0)
-        );
+        delete allAuctions[_nftContractAddress][_tokenId];
     }
 }
