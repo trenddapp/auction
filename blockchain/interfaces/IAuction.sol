@@ -4,101 +4,114 @@ pragma solidity ^0.8.0;
 /// @title The interface for the auction contract
 interface IAuction {
     /// @notice Emitted when an auction is created
-    /// @param startingPrice Opening bid
-    /// @param startingTimestamp When the auction starts
-    /// @param endingTimestamp When the auction ends
-    /// @param seller Auctioneer
+    /// @param owner Auctioneer
+    /// @param startPrice Opening bid
+    /// @param startTime When the auction starts
+    /// @param endTime When the auction ends
     event AuctionCreated(
         address nftContractAddress,
+        address owner,
         uint256 tokenId,
-        uint256 startingPrice,
-        uint64 startingTimestamp,
-        uint64 endingTimestamp,
-        address seller
+        uint256 startPrice,
+        uint64 startTime,
+        uint64 endTime
     );
 
     /// @notice Emitted when the auction is ended
     /// @param highestBidder Takes ownership of the item
     event AuctionEnded(
         address nftContractAddress,
+        address highestBidder,
         uint256 tokenId,
-        uint256 highestBid,
-        address highestBidder
+        uint256 highestBid
     );
 
     /// @notice Emitted when a bid is made
     event BidMade(
         address nftContractAddress,
+        address bidder,
         uint256 tokenId,
-        uint256 amount,
-        address bidder
+        uint256 amount
     );
 
+    /// @notice Emitted when the bid is withdrawn
+    event BidWithdrawn(address nftContractAddress, uint256 tokenId);
+
+    /// @notice Emitted when the auction is canceled
+    event AuctionCanceled(address nftContractAddress, uint256 tokenId);
+
     /// @notice Emitted when end time of the auction is updated
-    /// @param endingTimestamp New end time
-    event EndingTimestampUpdated(
+    /// @param endTime New end time
+    event EndTimeUpdated(
         address nftContractAddress,
         uint256 tokenId,
-        uint64 endingTimestamp
+        uint64 endTime
     );
 
     /// @notice Emitted when opening bid of the auction is updated
-    /// @param startingPrice New opening bid
-    event StartingPriceUpdated(
+    /// @param startPrice New opening bid
+    event OpeningBidUpdated(
         address nftContractAddress,
         uint256 tokenId,
-        uint256 startingPrice
+        uint256 startPrice
     );
 
     /// @notice Stores all information of all auctions
     /// @return The auction information for the NFT
-    function allAuctions(address _nftContractAddress, uint256 _tokenId)
+    function auctions(address, uint256)
         external
         returns (
-            uint64,
-            uint64,
-            uint256,
-            uint256,
             address,
-            address
+            address,
+            address,
+            uint256,
+            uint256,
+            uint64,
+            uint64
         );
 
-    /// @notice Bid for a specific NFT
+    /// @notice Make a bid for a specific NFT
     function bid(
-        address _nftContractAddress,
-        uint256 _tokenId,
-        uint256 _bidAmount
+        address nftContractAddress,
+        uint256 tokenId,
+        uint256 bidAmount
     ) external;
 
+    /// @notice Cancels the auction
+    function cancelAuction(address nftContractAddress, uint256 tokenId)
+        external;
+
     /// @notice Creates an auction for the given NFT
-    /// @param _startingPrice Opening bid
-    /// @param _startingTimestamp When the auction starts
-    /// @param _endingTimestamp When the auction ends
+    /// @param payToken Paying token
+    /// @param startPrice Opening bid
+    /// @param startTime When the auction starts
+    /// @param endTime When the auction ends
     function createAuction(
-        address _nftContractAddress,
-        uint256 _tokenId,
-        uint256 _startingPrice,
-        uint64 _startingTimestamp,
-        uint64 _endingTimestamp
+        address nftContractAddress,
+        address payToken,
+        uint256 tokenId,
+        uint256 startPrice,
+        uint64 startTime,
+        uint64 endTime
     ) external;
 
     /// @notice Ends the auction
-    function endAuction(address _nftContractAddress, uint256 _tokenId) external;
-
-    /// @notice If the auction does not end after 7 days, it will terminate the auction
-    function forceReset(address _nftContractAddress, uint256 _tokenId) external;
+    function endAuction(address nftContractAddress, uint256 tokenId) external;
 
     /// @notice Updates the end time of the auction
-    function updateEndingTimestamp(
-        address _nftContractAddress,
-        uint256 _tokenId,
-        uint64 _newEndingTimestamp
+    function updateEndTime(
+        address nftContractAddress,
+        uint256 tokenId,
+        uint64 newTimestamp
     ) external;
 
     /// @notice Updates the opening bid of the auction
-    function updateStartingPrice(
-        address _nftContractAddress,
-        uint256 _tokenId,
-        uint256 _newStartingPrice
+    function updateOpeningBid(
+        address nftContractAddress,
+        uint256 tokenId,
+        uint256 newPrice
     ) external;
+
+    /// @notice Withdraws the highest bid
+    function withdrawBid(address nftContractAddress, uint256 tokenId) external;
 }
