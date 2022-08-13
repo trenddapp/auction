@@ -1,147 +1,140 @@
 import brownie
-from brownie import accounts, Auction, Weth, Nft
-import pytest
+from brownie import accounts
 import time
 
 TOKEN_ID = 18
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+TOKEN_AMOUNT = 10 ** 19
+
+AUCTION_ALREADY_STARTED = "typed error: 0x628e3883"
+BIDDING_NOT_STARTED = "typed error: 0xe90fd1fe"
+BIDDING_ENDED = "typed error: 0x2d7a45db"
+BIDDING_NOT_ENDED = "typed error: 0xaae2b1aa"
+INVALID_AMOUNT = "typed error: 0x2c5211c6"
+INVALID_TIMESTAMP = "typed error: 0xb7d09497"
+HIGHEST_BIDDER_ONLY = "typed error: 0xa44e975b"
+NFT_NOT_APPROVED = "typed error: 0x6b2db6d0"
+NFT_OWNER_ONLY = "typed error: 0xc594caea"
+OWNER_ONLY = "typed error: 0x596dcdb8"
+TOKEN_NOT_APPROVED = "typed error: 0x32da96a3"
 
 
-@pytest.fixture
-def create_auction(deploy_auction, nft):
-    auction = deploy_auction[0]
-    weth = deploy_auction[1]
-    starting_price = 10 ** 18
-    starting_timestamp = int(time.time()) + 10
-    ending_timestamp = starting_timestamp + 30
-
-    nft.approve(auction, TOKEN_ID, {"from": accounts[0]})
-
-    auction.createAuction(nft, TOKEN_ID, starting_price,
-                          starting_timestamp, ending_timestamp, {"from": accounts[0]})
-
-    time.sleep(10)
-
-    return auction, nft, weth
+def wait_till_end(auction, nft):
+    start_time = auction.auctions(nft, TOKEN_ID)[5]
+    end_time = auction.auctions(nft, TOKEN_ID)[6]
+    wait_time = end_time - start_time + 10
+    time.sleep(wait_time)
 
 
-@pytest.fixture
-def deploy_auction():
-    weth = Weth.deploy({"from": accounts[1]})
-    auction = Auction.deploy({"from": accounts[0]})
-    auction.initialize(weth, {"from": accounts[0]})
-    return auction, weth
+def test_cant_create_auction_not_owner(deploy_auction, nft, token):
+    start_time = int(time.time()) + 10
+    end_time = start_time + 35
 
-
-@pytest.fixture
-def nft():
-    return Nft.deploy({"from": accounts[0]})
-
-
-def test_cant_create_auction_not_owner(deploy_auction, nft):
-    starting_price = 10 ** 18
-    starting_timestamp = int(time.time()) + 10
-    ending_timestamp = starting_timestamp + 35
-
-    with brownie.reverts("The sender doesn't own NFT!"):
-        deploy_auction[0].createAuction(nft, TOKEN_ID, starting_price,
-                                        starting_timestamp, ending_timestamp, {"from": accounts[1]})
+    with brownie.reverts(NFT_OWNER_ONLY):
+        deploy_auction.createAuction(nft, token, TOKEN_ID, TOKEN_AMOUNT,
+                                     start_time, end_time, {"from": accounts[1]})
 
 
 def test_cant_create_auction_started(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    starting_price = 10 ** 18
-    starting_timestamp = int(time.time()) + 10
-    ending_timestamp = starting_timestamp + 35
+    token = create_auction[2]
+    start_time = int(time.time()) + 10
+    end_time = start_time + 35
 
-    with brownie.reverts("The auction has already been started by the owner!"):
-        auction.createAuction(nft, TOKEN_ID, starting_price,
-                              starting_timestamp, ending_timestamp, {"from": accounts[0]})
-
-
-def test_cant_create_auction_timestamp_false(deploy_auction, nft):
-    starting_price = 10 ** 18
-    starting_timestamp = int(time.time()) - 60
-    ending_timestamp = starting_timestamp + 35
-
-    with brownie.reverts("startingTimestamp must be greater than now!"):
-        deploy_auction[0].createAuction(nft, TOKEN_ID, starting_price,
-                                        starting_timestamp, ending_timestamp, {"from": accounts[0]})
+    with brownie.reverts(AUCTION_ALREADY_STARTED):
+        auction.createAuction(nft, token, TOKEN_ID, TOKEN_AMOUNT,
+                              start_time, end_time, {"from": accounts[0]})
 
 
-def test_cant_create_auction_nft_not_approved(deploy_auction, nft):
-    starting_price = 10 ** 18
-    starting_timestamp = int(time.time()) + 60
-    ending_timestamp = starting_timestamp + 35
+def test_cant_create_auction_invalid_timestamp(deploy_auction, nft, token):
+    auction = deploy_auction
+    start_time = int(time.time()) - 1
+    end_time = int(time.time()) + 30
 
-    with brownie.reverts("The NFT is not approved!"):
-        deploy_auction[0].createAuction(nft, TOKEN_ID, starting_price,
-                                        starting_timestamp, ending_timestamp, {"from": accounts[0]})
+    nft.setApprovalForAll(auction, True, {"from": accounts[0]})
+
+    with brownie.reverts(INVALID_TIMESTAMP):
+        auction.createAuction(nft, token, TOKEN_ID, TOKEN_AMOUNT,
+                              start_time, end_time, {"from": accounts[0]})
+
+    start_time = int(time.time()) + 30
+    end_time = int(time.time()) - 1
+
+    with brownie.reverts(INVALID_TIMESTAMP):
+        deploy_auction.createAuction(nft, token, TOKEN_ID, TOKEN_AMOUNT,
+                                     start_time, end_time, {"from": accounts[0]})
+
+
+def test_cant_create_auction_nft_not_approved(deploy_auction, nft, token):
+    start_time = int(time.time()) + 60
+    end_time = start_time + 35
+
+    with brownie.reverts(NFT_NOT_APPROVED):
+        deploy_auction.createAuction(nft, token, TOKEN_ID, TOKEN_AMOUNT,
+                                     start_time, end_time, {"from": accounts[0]})
 
 
 def test_create_auction(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
+    token = create_auction[2]
 
-    assert auction.allAuctions(nft, TOKEN_ID)[-1] == accounts[0]  # seller
-
-    assert auction.allAuctions(nft, TOKEN_ID)[2] == 10 ** 18  # starting price
+    assert auction.auctions(nft, TOKEN_ID)[0] == accounts[0]  # owner
+    assert auction.auctions(nft, TOKEN_ID)[1] == token  # pay token
+    assert auction.auctions(nft, TOKEN_ID)[2] == ZERO_ADDRESS  # highest bidder
+    assert auction.auctions(nft, TOKEN_ID)[3] == 0  # highest bid
+    assert auction.auctions(nft, TOKEN_ID)[4] != 0  # opening bid
+    assert auction.auctions(nft, TOKEN_ID)[5] != 0  # start time
+    assert auction.auctions(nft, TOKEN_ID)[6] != 0  # end time
 
 
 def test_cant_bid_ended(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    weth = create_auction[2]
+    token = create_auction[2]
 
-    weth.approve(auction, 10 ** 19, {"from": accounts[1]})
+    token.approve(auction, TOKEN_AMOUNT, {"from": accounts[1]})
 
-    time.sleep(35)
+    wait_till_end(auction, nft)
 
-    with brownie.reverts("The auction is over!"):
-        auction.bid(nft, TOKEN_ID, 10 ** 19, {"from": accounts[1]})
+    with brownie.reverts(BIDDING_ENDED):
+        auction.bid(nft, TOKEN_ID, TOKEN_AMOUNT, {"from": accounts[1]})
 
 
-def test_cant_bid_lower_amount(create_auction):
+def test_cant_bid_invalid_amount(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    weth = create_auction[2]
+    token = create_auction[2]
 
-    weth.approve(auction, 10 ** 18, {"from": accounts[1]})
+    bid_amount = 10 ** 17
 
-    with brownie.reverts("The amount must be greater than the starting price!"):
-        auction.bid(nft, TOKEN_ID, 10 ** 17, {"from": accounts[1]})
+    token.approve(auction, bid_amount, {"from": accounts[1]})
 
-
-def test_cant_bid_seller(create_auction):
-    auction = create_auction[0]
-    nft = create_auction[1]
-
-    with brownie.reverts("The seller can not bid!"):
-        auction.bid(nft, TOKEN_ID, 10 ** 19, {"from": accounts[0]})
+    with brownie.reverts(INVALID_AMOUNT):
+        auction.bid(nft, TOKEN_ID, bid_amount, {"from": accounts[1]})
 
 
-def test_cant_bid_weth_not_approve(create_auction):
+def test_cant_bid_token_not_approve(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
 
-    with brownie.reverts("The amount is not approved!"):
-        auction.bid(nft, TOKEN_ID, 10 ** 19, {"from": accounts[1]})
+    with brownie.reverts(TOKEN_NOT_APPROVED):
+        auction.bid(nft, TOKEN_ID, TOKEN_AMOUNT, {"from": accounts[1]})
 
 
 def test_bid(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    weth = create_auction[2]
+    token = create_auction[2]
 
-    weth.approve(auction, 10 ** 19, {"from": accounts[1]})
+    token.approve(auction, TOKEN_AMOUNT, {"from": accounts[1]})
 
-    auction.bid(nft, TOKEN_ID, 10 ** 19, {"from": accounts[1]})
+    auction.bid(nft, TOKEN_ID, TOKEN_AMOUNT, {"from": accounts[1]})
 
-    assert auction.allAuctions(nft, TOKEN_ID)[3] == 10 ** 19  # highest bid
+    assert auction.auctions(nft, TOKEN_ID)[2] == accounts[1]  # highest bidder
 
-    assert auction.allAuctions(nft, TOKEN_ID)[
-        4] == accounts[1]  # highest bidder
+    assert auction.auctions(nft, TOKEN_ID)[3] == TOKEN_AMOUNT  # highest bid
 
 
 def test_cant_update_timestamp_ended(create_auction):
@@ -149,10 +142,10 @@ def test_cant_update_timestamp_ended(create_auction):
     nft = create_auction[1]
     new_timestamp = int(time.time()) + 10
 
-    time.sleep(35)
+    wait_till_end(auction, nft)
 
-    with brownie.reverts("The auction is over!"):
-        auction.updateEndingTimestamp(
+    with brownie.reverts(BIDDING_ENDED):
+        auction.updateEndTime(
             nft, TOKEN_ID, new_timestamp, {"from": accounts[0]})
 
 
@@ -161,60 +154,70 @@ def test_cant_update_timestamp_not_owner(create_auction):
     nft = create_auction[1]
     new_timestamp = int(time.time()) + 10
 
-    with brownie.reverts("The sender is not the seller!"):
-        auction.updateEndingTimestamp(
+    with brownie.reverts(OWNER_ONLY):
+        auction.updateEndTime(
             nft, TOKEN_ID, new_timestamp, {"from": accounts[1]})
+
+
+def test_cant_update_timestamp_invalid_time(create_auction):
+    auction = create_auction[0]
+    nft = create_auction[1]
+    new_timestamp = int(time.time())
+
+    with brownie.reverts(INVALID_TIMESTAMP):
+        auction.updateEndTime(
+            nft, TOKEN_ID, new_timestamp, {"from": accounts[0]})
 
 
 def test_update_timestamp(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    new_timestamp = int(time.time()) + 10
+    new_timestamp = auction.auctions(nft, TOKEN_ID)[-1] + 30
 
-    auction.updateEndingTimestamp(
+    auction.updateEndTime(
         nft, TOKEN_ID, new_timestamp, {"from": accounts[0]})
 
-    assert auction.allAuctions(nft, TOKEN_ID)[1] == new_timestamp
+    assert auction.auctions(nft, TOKEN_ID)[-1] == new_timestamp
 
 
 def test_cant_update_price_ended(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    new_price = 10 ** 17
+    new_price = 10 ** 20
 
-    time.sleep(35)
+    wait_till_end(auction, nft)
 
-    with brownie.reverts("The auction is over!"):
-        auction.updateStartingPrice(
+    with brownie.reverts(BIDDING_ENDED):
+        auction.updateOpeningBid(
             nft, TOKEN_ID, new_price, {"from": accounts[0]})
 
 
 def test_cant_update_price_not_owner(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    new_price = 10 ** 17
+    new_price = 10 ** 20
 
-    with brownie.reverts("The sender is not the seller!"):
-        auction.updateStartingPrice(
+    with brownie.reverts(OWNER_ONLY):
+        auction.updateOpeningBid(
             nft, TOKEN_ID, new_price, {"from": accounts[1]})
 
 
 def test_update_price(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    new_price = 10 ** 17
+    new_price = 10 ** 20
 
-    auction.updateStartingPrice(
+    auction.updateOpeningBid(
         nft, TOKEN_ID, new_price, {"from": accounts[0]})
 
-    assert auction.allAuctions(nft, TOKEN_ID)[2] == new_price
+    assert auction.auctions(nft, TOKEN_ID)[4] == new_price
 
 
-def test_cant_end_not_ended(create_auction):
+def test_cant_end_ongoing(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
 
-    with brownie.reverts("The auction is not over!"):
+    with brownie.reverts(BIDDING_NOT_ENDED):
         auction.endAuction(nft, TOKEN_ID, {"from": accounts[0]})
 
 
@@ -222,51 +225,14 @@ def test_end(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
 
-    time.sleep(35)
+    wait_till_end(auction, nft)
 
     auction.endAuction(nft, TOKEN_ID, {"from": accounts[0]})
 
-    assert auction.allAuctions(
-        nft, TOKEN_ID)[-1] == ZERO_ADDRESS
-
-
-def test_cant_force_reset_ended(create_auction):
-    auction = create_auction[0]
-    nft = create_auction[1]
-
-    time.sleep(35)
-
-    auction.endAuction(nft, TOKEN_ID, {"from": accounts[0]})
-
-    with brownie.reverts("The auction has already ended!"):
-        auction.forceReset(nft, TOKEN_ID, {"from": accounts[0]})
-
-
-def test_cant_force_reset_ongoing(create_auction):
-    auction = create_auction[0]
-    nft = create_auction[1]
-
-    with brownie.reverts("You can only force reset after 7 days!"):
-        auction.forceReset(nft, TOKEN_ID, {"from": accounts[0]})
-
-
-def test_cant_force_reset_ended_before_7_days(create_auction):
-    auction = create_auction[0]
-    nft = create_auction[1]
-
-    time.sleep(35)
-
-    with brownie.reverts("You can only force reset after 7 days!"):
-        auction.forceReset(nft, TOKEN_ID, {"from": accounts[0]})
-
-
-def test_force_reset(create_auction):
-    auction = create_auction[0]
-    nft = create_auction[1]
-
-    time.sleep((7*24*60*60)+30)  # 7 days
-
-    auction.forceReset(nft, TOKEN_ID, {"from": accounts[0]})
-
-    assert auction.allAuctions(
-        nft, TOKEN_ID)[-1] == ZERO_ADDRESS
+    assert auction.auctions(nft, TOKEN_ID)[0] == ZERO_ADDRESS  # owner
+    assert auction.auctions(nft, TOKEN_ID)[1] == ZERO_ADDRESS  # pay token
+    assert auction.auctions(nft, TOKEN_ID)[2] == ZERO_ADDRESS  # highest bidder
+    assert auction.auctions(nft, TOKEN_ID)[3] == 0  # highest bid
+    assert auction.auctions(nft, TOKEN_ID)[4] == 0  # opening bid
+    assert auction.auctions(nft, TOKEN_ID)[5] == 0  # start time
+    assert auction.auctions(nft, TOKEN_ID)[6] == 0  # end time
