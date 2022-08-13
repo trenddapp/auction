@@ -1,12 +1,12 @@
 import brownie
-from brownie import accounts, Auction, AuctionProxy, AuctionV2, Contract, Weth
+from brownie import accounts, Auction, AuctionProxy, AuctionV2, Contract, Token
 import pytest
 from scripts.useful import encode_function_data, upgrade
 
 
 @pytest.fixture
 def deploy():
-    weth = Weth.deploy({"from": accounts[0]})
+    weth = Token.deploy({"from": accounts[0]})
     auction = Auction.deploy({"from": accounts[0]})
     encoded_initializer_function = encode_function_data()
     proxy = AuctionProxy.deploy(
@@ -19,7 +19,7 @@ def deploy():
     auction_proxy = Contract.from_abi(
         "Proxy", proxy.address, auction_v2.abi)
 
-    auction_proxy.initialize(weth, {"from": accounts[0]})
+    auction_proxy.initialize({"from": accounts[0]})
 
     return auction, auction_v2, auction_proxy, weth
 

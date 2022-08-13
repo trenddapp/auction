@@ -9,6 +9,7 @@ import "@openzeppelinUpgradeable/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelinUpgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 error AuctionAlreadyStarted();
+error BiddingNotStarted();
 error BiddingPeriodEnded();
 error BiddingPeriodNotEnded();
 error InvalidAmount();
@@ -44,10 +45,9 @@ contract Auction is
     modifier isOngoing(address nftContractAddress, uint256 tokenId) {
         AuctionInfo memory auction = auctions[nftContractAddress][tokenId];
 
-        if (
-            block.timestamp < auction.startTime &&
-            block.timestamp > auction.endTime
-        ) revert BiddingPeriodEnded();
+        if (block.timestamp > auction.endTime) revert BiddingPeriodEnded();
+
+        if (block.timestamp < auction.startTime) revert BiddingNotStarted();
         _;
     }
 
@@ -70,7 +70,7 @@ contract Auction is
 
         // ensure this contract is approved to move the token
         if (
-            IERC20(auction.payToken).allowance(auction.owner, address(this)) <
+            IERC20(auction.payToken).allowance(msg.sender, address(this)) <
             bidAmount
         ) revert TokenNotApproved();
 
