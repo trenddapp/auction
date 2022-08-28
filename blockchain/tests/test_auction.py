@@ -1,9 +1,8 @@
 import brownie
-from brownie import accounts
+from brownie import accounts, ZERO_ADDRESS
 import time
 
 TOKEN_ID = 18
-ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 TOKEN_AMOUNT = 10 ** 19
 
 AUCTION_ALREADY_STARTED = "typed error: 0x628e3883"
