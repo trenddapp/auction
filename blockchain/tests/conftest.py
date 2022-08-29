@@ -5,6 +5,14 @@ import time
 TOKEN_ID = 18
 
 
+def auctioneer():
+    return accounts[0]
+
+
+def bidder():
+    return accounts[1]
+
+
 @pytest.fixture
 def create_auction(deploy_auction, nft, token):
     auction = deploy_auction
@@ -12,10 +20,10 @@ def create_auction(deploy_auction, nft, token):
     start_time = int(time.time()) + 1
     end_time = start_time + 20
 
-    nft.setApprovalForAll(auction, True, {"from": accounts[0]})
+    nft.setApprovalForAll(auction, True, {"from": auctioneer()})
 
     auction.createAuction(nft, token, TOKEN_ID, opening_bid,
-                          start_time, end_time, {"from": accounts[0]})
+                          start_time, end_time, {"from": auctioneer()})
     time.sleep(2)
 
     return auction, nft, token
@@ -23,16 +31,16 @@ def create_auction(deploy_auction, nft, token):
 
 @pytest.fixture
 def deploy_auction():
-    auction = Auction.deploy({"from": accounts[0]})
-    auction.initialize({"from": accounts[0]})
+    auction = Auction.deploy({"from": auctioneer()})
+    auction.initialize({"from": auctioneer()})
     return auction
 
 
 @pytest.fixture
 def nft():
-    return Nft.deploy({"from": accounts[0]})
+    return Nft.deploy({"from": auctioneer()})
 
 
 @pytest.fixture
 def token():
-    return Token.deploy({"from": accounts[1]})
+    return Token.deploy({"from": bidder()})
