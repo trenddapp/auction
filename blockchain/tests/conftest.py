@@ -1,4 +1,4 @@
-from brownie import accounts, Auction, Nft, Token
+from brownie import accounts, Auction, chain, Nft, Token
 import pytest
 import time
 
@@ -17,7 +17,7 @@ def bidder():
 def create_auction(deploy_auction, nft, token):
     auction = deploy_auction
     opening_bid = 10 ** 18
-    start_time = int(time.time()) + 1
+    start_time = chain.time() + 1
     end_time = start_time + 20
 
     nft.setApprovalForAll(auction, True, {"from": auctioneer()})
