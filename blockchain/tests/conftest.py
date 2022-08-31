@@ -1,4 +1,4 @@
-from brownie import accounts, Auction, chain, Nft, Token
+from brownie import accounts, Auction, chain, Nft, Token, Wei
 import pytest
 import time
 
@@ -16,7 +16,7 @@ def bidder():
 @pytest.fixture
 def create_auction(deploy_auction, nft, token):
     auction = deploy_auction
-    opening_bid = 10 ** 18
+    opening_bid = Wei("1 ether")
     start_time = chain.time() + 1
     end_time = start_time + 20
 
