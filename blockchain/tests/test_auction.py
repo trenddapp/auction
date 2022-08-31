@@ -1,10 +1,10 @@
 import brownie
-from brownie import chain, ZERO_ADDRESS
+from brownie import chain, Wei, ZERO_ADDRESS
 from conftest import auctioneer, bidder
 import time
 
 TOKEN_ID = 18
-TOKEN_AMOUNT = 10 ** 19
+TOKEN_AMOUNT = Wei("10 ether")
 
 AUCTION_ALREADY_STARTED = "typed error: 0x628e3883"
 BIDDING_NOT_STARTED = "typed error: 0xe90fd1fe"
@@ -107,7 +107,7 @@ def test_cant_bid_invalid_amount(create_auction):
     nft = create_auction[1]
     token = create_auction[2]
 
-    bid_amount = 10 ** 17
+    bid_amount = Wei("0.1 ether")
 
     token.approve(auction, bid_amount, {"from": bidder()})
 
@@ -183,7 +183,7 @@ def test_update_timestamp(create_auction):
 def test_cant_update_price_ended(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    new_price = 10 ** 20
+    new_price = Wei("100 ether")
 
     wait_till_end(auction, nft)
 
@@ -195,7 +195,7 @@ def test_cant_update_price_ended(create_auction):
 def test_cant_update_price_not_owner(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    new_price = 10 ** 20
+    new_price = Wei("100 ether")
 
     with brownie.reverts(OWNER_ONLY):
         auction.updateOpeningBid(
@@ -205,7 +205,7 @@ def test_cant_update_price_not_owner(create_auction):
 def test_update_price(create_auction):
     auction = create_auction[0]
     nft = create_auction[1]
-    new_price = 10 ** 20
+    new_price = Wei("100 ether")
 
     auction.updateOpeningBid(
         nft, TOKEN_ID, new_price, {"from": auctioneer()})
